@@ -2,220 +2,162 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SOSIFY — AI Content & Video Marketing</title>
+<title>SOSIFY — Free Video Studio</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./config.js"></script>
 <style>
-:root{--bg:#f6f7fb;--panel:#fff;--ink:#17172b;--muted:#777991;--line:#ececf3;--purple:#7257f5;--purple2:#927cff;--navy:#17162e;--green:#18a979}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
-.app{display:flex;min-height:100vh}.sidebar{width:248px;background:var(--navy);color:#fff;padding:24px 16px;display:flex;flex-direction:column;gap:28px;flex-shrink:0}
-.brand{display:flex;align-items:center;gap:11px;padding:0 10px}.logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#a18cff,#6546ee);display:grid;place-items:center;font-weight:900;font-size:19px;box-shadow:0 8px 22px #7257f555}.brand b{font-size:21px;letter-spacing:1.4px}.brand small{display:block;color:#aaa7c8;font-size:10px;letter-spacing:1.3px;margin-top:-2px}
-.navlabel{font-size:10px;color:#8986a8;letter-spacing:1.4px;padding:0 12px;margin:0 0 8px}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#c5c3d8;text-align:left;padding:11px 12px;border-radius:10px;display:flex;gap:12px;align-items:center;font:inherit;cursor:pointer}.nav button:hover,.nav button.active{background:#302b50;color:white}.nav button.active{box-shadow:inset 3px 0 #a18cff}.ico{width:19px;text-align:center;font-size:16px}.sidebottom{margin-top:auto;background:#252141;border:1px solid #393452;border-radius:14px;padding:14px}.sidebottom b{font-size:12px}.sidebottom p{font-size:11px;color:#aaa7c8;margin:5px 0 12px}.progress{height:5px;border-radius:9px;background:#48415f;overflow:hidden}.progress span{display:block;width:32%;height:100%;background:#a18cff}
-main{flex:1;min-width:0}.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;position:sticky;top:0;z-index:3}.crumb{color:var(--muted)}.crumb b{color:var(--ink)}.topright{display:flex;align-items:center;gap:18px}.iconbtn{border:1px solid var(--line);background:white;border-radius:10px;width:38px;height:38px;cursor:pointer}.avatar{width:35px;height:35px;border-radius:50%;background:#e8e1ff;color:#5d45d5;display:grid;place-items:center;font-weight:700}.content{max-width:1280px;margin:auto;padding:30px 34px 50px}.welcome{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:25px}.eyebrow{color:var(--purple);font-size:11px;font-weight:800;letter-spacing:1.5px}.welcome h1{font-size:27px;line-height:1.2;margin:6px 0}.welcome p{color:var(--muted);margin:6px 0}.primary{border:0;background:var(--purple);color:#fff;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px #7257f533}.primary:hover{background:#6045e7}.secondary{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:650;color:#39384d}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px}.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:15px}.stat{padding:17px}.stathead{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.staticon{width:32px;height:32px;border-radius:10px;background:#f0edff;color:var(--purple);display:grid;place-items:center}.stat strong{display:block;font-size:25px;margin:10px 0 2px}.trend{color:var(--green);font-size:11px}.muted{color:var(--muted)}.grid2{display:grid;grid-template-columns:1.45fr 1fr;gap:17px}.card{padding:20px}.cardhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.cardhead h3{margin:0;font-size:15px}.cardhead span{font-size:11px;color:var(--muted)}.hero{background:linear-gradient(115deg,#211b46,#4932a3 65%,#8066f5);color:white;border:0;overflow:hidden;position:relative;min-height:205px}.hero:after{content:"✦";position:absolute;font-size:190px;right:25px;top:-45px;color:#ffffff12}.hero .eyebrow{color:#c8bdff}.hero h2{font-size:22px;max-width:400px;line-height:1.25;margin:8px 0}.hero p{color:#d7d1f4;max-width:410px;font-size:12px}.hero button{background:white;color:#553bc9;box-shadow:none;margin-top:8px}.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.quick button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:15px;text-align:left;cursor:pointer}.quick button:hover{border-color:#b7aaff;background:#fbfaff}.quick i{font-style:normal;font-size:20px}.quick b{display:block;margin:8px 0 2px}.quick small{color:var(--muted)}.activity{margin-top:17px}.activityrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.thumb{width:48px;height:42px;border-radius:9px;background:linear-gradient(135deg,#f2d9c8,#a88dfb);display:grid;place-items:center;font-size:19px}.activityrow b{font-size:12px}.activityrow small{display:block;color:var(--muted);font-size:11px}.status{margin-left:auto;background:#e8f8f1;color:#14865f;padding:4px 8px;border-radius:20px;font-size:10px}
-.page{display:none}.page.active{display:block}.studio-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:700}.field input,.field textarea,.field select{width:100%;border:1px solid #e4e3ed;border-radius:9px;padding:11px 12px;font:inherit;background:#fff;color:var(--ink)}.field textarea{min-height:105px;resize:vertical}.hint{font-size:10px;color:var(--muted)}.ratio{display:flex;gap:8px}.ratio button{flex:1;border:1px solid var(--line);background:white;border-radius:9px;padding:9px;cursor:pointer}.ratio button.selected{border-color:var(--purple);background:#f4f1ff;color:#5b42d6;font-weight:700}.preview{background:#f3f1fb;border:1px dashed #c9c1ef;border-radius:13px;min-height:275px;display:grid;place-items:center;text-align:center;padding:20px}.preview .play{width:54px;height:54px;border-radius:50%;background:#fff;color:var(--purple);display:grid;place-items:center;margin:0 auto 12px;font-size:20px;box-shadow:0 5px 20px #34256b18}.preview p{color:var(--muted);font-size:12px;max-width:230px}.notice{background:#fff8e9;border:1px solid #f4e5c2;border-radius:10px;padding:11px 13px;color:#79591b;font-size:11px;margin-top:14px}.toast{position:fixed;bottom:22px;right:22px;background:#201b3b;color:white;padding:13px 17px;border-radius:11px;box-shadow:0 10px 30px #0002;display:none;z-index:10}.toast.show{display:block}
-@media(max-width:900px){.sidebar{width:210px}.stats{grid-template-columns:repeat(2,1fr)}.grid2,.studio-layout{grid-template-columns:1fr}.content{padding:24px}.topbar{padding:0 24px}}
-@media(max-width:640px){.sidebar{width:65px;padding:20px 8px}.brand{padding:0;justify-content:center}.brand>div:last-child,.navlabel,.nav button span:not(.ico),.sidebottom{display:none}.nav button{justify-content:center;padding:12px 4px}.topbar{padding:0 15px}.content{padding:20px 14px}.welcome{display:block}.welcome .primary{margin-top:12px}.stats{gap:9px}.stat{padding:12px}.stat strong{font-size:21px}.grid2{gap:12px}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}}
-
+:root{--bg:#f6f7fb;--panel:#fff;--ink:#17172b;--muted:#777991;--line:#ececf3;--purple:#7257f5;--navy:#17162e;--green:#13865f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
 .auth-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 20% 10%,#e9e3ff,transparent 35%),#f6f7fb}
-.auth-card{width:min(100%,440px);background:#fff;border:1px solid #ececf3;border-radius:20px;padding:30px;box-shadow:0 18px 60px #24184b12}
-.auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.auth-logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#a18cff,#6546ee);display:grid;place-items:center;color:white;font-weight:900;font-size:22px}
-.auth-card h1{margin:0 0 6px;font-size:24px}.auth-card p{color:#777991;margin:0 0 22px}.auth-card label{display:block;font-weight:700;font-size:12px;margin:13px 0 6px}.auth-card input{width:100%;padding:12px;border:1px solid #e4e3ed;border-radius:9px;font:inherit}.auth-card button{width:100%;margin-top:17px}.auth-switch{text-align:center;margin-top:16px;font-size:12px;color:#777991}.auth-switch a{color:#6546ee;font-weight:700;cursor:pointer}.auth-error{display:none;background:#fff0f0;color:#a32c2c;border-radius:9px;padding:10px;font-size:12px;margin-top:12px}.auth-note{font-size:11px;color:#777991;margin-top:15px}.user-email{font-size:12px;color:#777991}
-
+.auth-card{width:min(100%,440px);background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:0 18px 60px #24184b12}
+.brand{display:flex;align-items:center;gap:11px}.logo{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#a18cff,#6546ee);display:grid;place-items:center;color:white;font-weight:900;font-size:20px}.brand b{font-size:21px;letter-spacing:1.4px}.brand small{display:block;color:#aaa7c8;font-size:10px;letter-spacing:1.3px}
+.auth-card h1{margin:24px 0 5px;font-size:24px}.auth-card p{color:var(--muted);margin:0 0 20px}.auth-card label,.field label{display:block;font-weight:700;font-size:12px;margin:13px 0 6px}
+.auth-card input,.field input,.field textarea,.field select{width:100%;border:1px solid #e4e3ed;border-radius:9px;padding:11px 12px;background:#fff;color:var(--ink)}
+.auth-card input{padding:12px}.auth-card button{width:100%;margin-top:16px}
+.primary{border:0;background:var(--purple);color:#fff;border-radius:10px;padding:11px 16px;font-weight:750;box-shadow:0 6px 16px #7257f533}.primary:hover{background:#6045e7}.secondary{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-weight:650;color:#39384d}
+.auth-switch{text-align:center;margin-top:16px;color:var(--muted);font-size:12px}.auth-switch a{color:var(--purple);font-weight:700;cursor:pointer}.error{display:none;background:#fff0f0;color:#a32c2c;border-radius:9px;padding:10px;font-size:12px;margin-top:12px}
+.app{display:flex;min-height:100vh}.sidebar{width:230px;background:var(--navy);color:#fff;padding:23px 15px;display:flex;flex-direction:column;gap:26px;flex-shrink:0}
+.navlabel{font-size:10px;color:#8986a8;letter-spacing:1.4px;padding:0 12px;margin-bottom:8px}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#c5c3d8;text-align:left;padding:11px 12px;border-radius:10px;display:flex;gap:12px;align-items:center}.nav button:hover,.nav button.active{background:#302b50;color:white}.nav button.active{box-shadow:inset 3px 0 #a18cff}.sidefoot{margin-top:auto;color:#aaa7c8;font-size:11px;padding:12px}
+main{flex:1;min-width:0}.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:4}.topright{display:flex;align-items:center;gap:12px}.useremail{color:var(--muted);font-size:12px}.avatar{width:34px;height:34px;border-radius:50%;background:#e8e1ff;color:#5d45d5;display:grid;place-items:center;font-weight:700}
+.content{max-width:1440px;margin:auto;padding:26px 28px 55px}.welcome{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px}.eyebrow{color:var(--purple);font-size:10px;font-weight:800;letter-spacing:1.5px}.welcome h1{font-size:27px;margin:5px 0}.welcome p{color:var(--muted);margin:5px 0}
+.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:18px}.studio{display:grid;grid-template-columns:minmax(330px,.95fr) minmax(360px,1.05fr);gap:17px;align-items:start}.field{margin-bottom:13px}.field label{margin-top:0}.field textarea{min-height:85px;resize:vertical}.hint{font-size:10px;color:var(--muted)}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ratios{display:flex;gap:8px}.ratios button{flex:1;border:1px solid var(--line);background:white;border-radius:9px;padding:9px}.ratios button.active{border-color:var(--purple);background:#f4f1ff;color:#5b42d6;font-weight:700}
+.drop{border:1px dashed #c9c1ef;border-radius:11px;padding:15px;text-align:center;background:#faf9ff;color:var(--muted);font-size:12px}.drop input{max-width:100%;margin-top:8px}.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.thumbs img{width:62px;height:62px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.previewwrap{background:#eeedf4;border-radius:14px;padding:15px}.previewbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.canvasbox{display:grid;place-items:center;min-height:420px;background:#e5e3ec;border-radius:10px;overflow:hidden;padding:10px}
+canvas{max-width:100%;max-height:68vh;background:#151326;border-radius:5px;box-shadow:0 8px 25px #17132620}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.controls button{border-radius:9px}.timeline{margin-top:15px}.timelinehead{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:7px}.progress{height:7px;border-radius:20px;background:#e9e7f0;overflow:hidden}.progress span{display:block;height:100%;width:0;background:var(--purple);transition:width .2s}
+.notice{background:#fff8e9;border:1px solid #f4e5c2;border-radius:10px;padding:10px 12px;color:#79591b;font-size:11px;margin-top:12px}
+.projects{margin-top:18px}.projectrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.projecticon{width:42px;height:42px;background:#f0edff;border-radius:10px;display:grid;place-items:center;font-size:18px}.projectrow small{display:block;color:var(--muted)}.pill{margin-left:auto;background:#e8f8f1;color:var(--green);padding:4px 9px;border-radius:20px;font-size:10px}
+.toast{position:fixed;bottom:20px;right:20px;background:#201b3b;color:white;padding:12px 16px;border-radius:11px;display:none;z-index:10;max-width:min(90vw,420px)}.toast.show{display:block}
+@media(max-width:980px){.studio{grid-template-columns:1fr}.canvasbox{min-height:320px}}
+@media(max-width:650px){.sidebar{width:64px;padding:18px 7px}.brand .brandtext,.navlabel,.nav button span:not(.ico),.sidefoot{display:none}.brand{justify-content:center}.nav button{justify-content:center;padding:12px 4px}.topbar{padding:0 12px}.content{padding:18px 12px}.welcome{display:block}.two{grid-template-columns:1fr}.canvasbox{min-height:260px}}
 </style>
 </head>
 <body>
-
 <div class="auth-screen" id="authScreen">
  <div class="auth-card">
-  <div class="auth-brand"><div class="auth-logo">S</div><div><b style="font-size:21px;letter-spacing:1.3px">SOSIFY</b><div style="font-size:10px;color:#777991;letter-spacing:1.2px">CREATE · AUTOMATE · GROW</div></div></div>
-  <h1 id="authTitle">Masuk ke SOSIFY</h1>
-  <p id="authSubtitle">Masuk untuk mengelola studio konten AI Anda.</p>
+  <div class="brand"><div class="logo">S</div><div class="brandtext"><b>SOSIFY</b><small>CREATE · AUTOMATE · GROW</small></div></div>
+  <h1 id="authTitle">Masuk ke SOSIFY</h1><p id="authSub">Masuk untuk membuat dan menyimpan video.</p>
   <form id="authForm">
-   <div id="nameWrap" style="display:none"><label for="authName">Nama</label><input id="authName" autocomplete="name" placeholder="Nama Anda"></div>
-   <label for="authEmail">Email</label><input id="authEmail" type="email" required autocomplete="email" placeholder="nama@email.com">
-   <label for="authPassword">Password</label><input id="authPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="Minimal 6 karakter">
-   <button class="primary" id="authSubmit" type="submit">Masuk</button>
-   <div class="auth-error" id="authError"></div>
+   <div id="nameWrap" class="hidden"><label>Nama</label><input id="authName" autocomplete="name"></div>
+   <label>Email</label><input id="authEmail" type="email" required autocomplete="email" placeholder="nama@email.com">
+   <label>Password</label><input id="authPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="Minimal 6 karakter">
+   <button class="primary" id="authSubmit">Masuk</button><div class="error" id="authError"></div>
   </form>
-  <div class="auth-switch"><span id="authSwitchText">Belum punya akun?</span> <a id="authSwitch">Daftar sekarang</a></div>
-  <div class="auth-note">Akun Anda diamankan menggunakan Supabase Authentication.</div>
+  <div class="auth-switch"><span id="switchText">Belum punya akun?</span> <a id="switchMode">Daftar sekarang</a></div>
  </div>
 </div>
-
-<div class="app" id="app" style="display:none">
-<aside class="sidebar">
- <div class="brand"><div class="logo">S</div><div><b>SOSIFY</b><small>CREATE · AUTOMATE · GROW</small></div></div>
- <div><div class="navlabel">WORKSPACE</div><nav class="nav">
-  <button class="active" data-page="dashboard"><span class="ico">⌂</span><span>Dashboard</span></button>
-  <button data-page="video"><span class="ico">▣</span><span>AI Video Studio</span></button>
-  <button data-page="image"><span class="ico">▧</span><span>AI Image Studio</span></button>
-  <button data-page="caption"><span class="ico">✎</span><span>AI Caption</span></button>
-  <button data-page="calendar"><span class="ico">▦</span><span>Content Calendar</span></button>
-  <button data-page="social"><span class="ico">◎</span><span>Social Accounts</span></button>
- </nav></div>
- <div><div class="navlabel">MANAGEMENT</div><nav class="nav">
-  <button data-page="analytics"><span class="ico">⌁</span><span>Analytics</span></button>
-  <button data-page="billing"><span class="ico">◇</span><span>Plan & Credits</span></button>
-  <button data-page="settings"><span class="ico">⚙</span><span>Settings</span></button>
- </nav></div>
- <div class="sidebottom"><b>Free Plan</b><p>Anda menggunakan 32 dari 100 kredit demo.</p><div class="progress"><span></span></div></div>
-</aside>
-<main>
- <header class="topbar"><div class="crumb">Workspace / <b id="crumb">Dashboard</b></div><div class="topright"><span class="user-email" id="userEmail"></span><button class="secondary" id="logoutBtn" style="padding:8px 11px">Keluar</button><div class="avatar" id="userAvatar">U</div></div></header>
- <div class="content">
-  <section class="page active" id="dashboard">
-   <div class="welcome"><div><div class="eyebrow">SOSIFY WORKSPACE</div><h1>Selamat datang di Sosify 👋</h1><p>Studio AI untuk membuat, mengelola, dan mengembangkan konten sosial media Anda.</p></div><button class="primary" onclick="showPage('video')">＋ Buat video AI</button></div>
-   <div class="stats">
-    <div class="stat"><div class="stathead">Video dibuat <span class="staticon">▣</span></div><strong>12</strong><span class="trend">↑ 3 minggu ini</span></div>
-    <div class="stat"><div class="stathead">Konten terjadwal <span class="staticon">▦</span></div><strong>8</strong><span class="muted">Siap dipublikasikan</span></div>
-    <div class="stat"><div class="stathead">Akun terhubung <span class="staticon">◎</span></div><strong>0</strong><span class="muted">Hubungkan akun pertama</span></div>
-    <div class="stat"><div class="stathead">Kredit AI tersisa <span class="staticon">✧</span></div><strong>68</strong><span class="muted">Dari 100 kredit demo</span></div>
-   </div>
-   <div class="grid2">
-    <div>
-     <div class="card hero"><div class="eyebrow">INTRODUCING AI VIDEO STUDIO</div><h2>Ubah ide menjadi video yang menarik dengan AI.</h2><p>Buat video promosi, konten produk, dan video sosial media dari teks atau gambar.</p><button class="primary" onclick="showPage('video')">Mulai buat video →</button></div>
-     <div class="card activity"><div class="cardhead"><h3>Aktivitas terbaru</h3><span>Lihat semua</span></div>
-      <div class="activityrow"><div class="thumb">🎬</div><div><b>Video promosi produk</b><small>Draft · Baru saja</small></div><span class="status">Draft</span></div>
-      <div class="activityrow"><div class="thumb">✍️</div><div><b>Caption campaign November</b><small>Dibuat kemarin</small></div><span class="status">Selesai</span></div>
-      <div class="activityrow"><div class="thumb">🖼️</div><div><b>Visual promo akhir tahun</b><small>Dibuat 2 hari lalu</small></div><span class="status">Selesai</span></div>
+<div class="app hidden" id="app">
+ <aside class="sidebar">
+  <div class="brand"><div class="logo">S</div><div class="brandtext"><b>SOSIFY</b><small>FREE VIDEO STUDIO</small></div></div>
+  <div><div class="navlabel">WORKSPACE</div><nav class="nav">
+   <button class="active" data-tab="studio"><span class="ico">▣</span><span>Free Video Studio</span></button>
+   <button data-tab="projects"><span class="ico">▤</span><span>Proyek Saya</span></button>
+  </nav></div>
+  <div class="sidefoot">Free Studio · Render di perangkat Anda<br>Tanpa biaya API video AI.</div>
+ </aside>
+ <main>
+  <header class="topbar"><div>Workspace / <b id="crumb">Free Video Studio</b></div><div class="topright"><span class="useremail" id="userEmail"></span><button class="secondary" id="logoutBtn">Keluar</button><div class="avatar" id="avatar">S</div></div></header>
+  <div class="content">
+   <section id="studioTab">
+    <div class="welcome"><div><div class="eyebrow">SOSIFY CREATIVE STUDIO</div><h1>Free Video Studio</h1><p>Rangkai foto, teks, gerakan kamera, dan musik menjadi video yang siap diunduh.</p></div><span class="pill">Gratis · Browser rendering</span></div>
+    <div class="studio">
+     <div class="panel">
+      <div class="field"><label>Judul video</label><input id="projectTitle" value="Video promosi saya" maxlength="90"></div>
+      <div class="field"><label>Jenis konten</label><select id="contentType"><option value="slideshow">Slideshow foto</option><option value="text">Teks animasi / promosi</option><option value="product">Iklan produk</option><option value="image-motion">Foto dengan gerakan kamera</option></select></div>
+      <div class="field"><label>Naskah / teks video</label><textarea id="scriptText" placeholder="Contoh: Kenalkan produk terbaru kami. Kualitas terbaik, harga bersahabat. Pesan sekarang!">Temukan sesuatu yang istimewa.
+Kualitas terbaik untuk setiap kebutuhan.
+Mulai sekarang bersama kami!</textarea><div class="hint">Pisahkan setiap adegan dengan baris baru. Setiap baris menjadi satu scene.</div></div>
+      <div class="field"><label>Foto / gambar (bisa pilih beberapa)</label><div class="drop">Pilih gambar JPG, PNG, atau WebP<input type="file" id="images" accept="image/png,image/jpeg,image/webp" multiple></div><div class="thumbs" id="thumbs"></div></div>
+      <div class="two">
+       <div class="field"><label>Durasi per scene</label><select id="sceneDuration"><option value="3">3 detik</option><option value="4" selected>4 detik</option><option value="5">5 detik</option><option value="6">6 detik</option></select></div>
+       <div class="field"><label>Gaya visual</label><select id="visualStyle"><option value="cinematic">Cinematic</option><option value="clean">Minimalis</option><option value="bold">Bold / promo</option><option value="soft">Soft</option></select></div>
+      </div>
+      <div class="field"><label>Format video</label><div class="ratios"><button type="button" data-ratio="9:16" class="active">9:16<br><small>Reels</small></button><button type="button" data-ratio="16:9">16:9<br><small>YouTube</small></button><button type="button" data-ratio="1:1">1:1<br><small>Feed</small></button></div></div>
+      <div class="field"><label>Musik latar (opsional)</label><input type="file" id="music" accept="audio/*"><div class="hint">Gunakan audio yang Anda miliki hak penggunaannya. Musik akan direkam bersama video.</div></div>
+      <div class="controls"><button class="primary" id="previewBtn" type="button">▶ Preview video</button><button class="secondary" id="renderBtn" type="button">⬇ Render & download MP4/WebM</button></div>
+      <div class="notice">Render gratis dilakukan di browser perangkat Anda. Format unduhan WebM didukung luas; MP4 hanya tersedia bila browser mendukung codec MP4. Untuk hasil optimal, gunakan Chrome desktop.</div>
+     </div>
+     <div class="panel">
+      <div class="previewbar"><b>Preview video</b><span class="hint" id="previewMeta">9:16 · siap</span></div>
+      <div class="canvasbox"><canvas id="stage" width="540" height="960"></canvas></div>
+      <div class="timeline"><div class="timelinehead"><span id="renderStatus">Siap membuat video</span><span id="timeLabel">0%</span></div><div class="progress"><span id="progress"></span></div></div>
+      <div class="projects"><b>Alur kerja</b><p class="hint">1. Masukkan teks dan foto · 2. Preview · 3. Render · 4. Unduh · 5. Riwayat proyek tersimpan di akun Anda.</p></div>
      </div>
     </div>
-    <div class="card"><div class="cardhead"><h3>Mulai berkarya</h3><span>AI tools</span></div><div class="quick">
-      <button onclick="showPage('video')"><i>🎬</i><b>AI Video</b><small>Text & image to video</small></button>
-      <button onclick="showPage('image')"><i>🖼️</i><b>AI Image</b><small>Buat visual kreatif</small></button>
-      <button onclick="showPage('caption')"><i>✍️</i><b>AI Caption</b><small>Caption dan hashtag</small></button>
-      <button onclick="showPage('calendar')"><i>🗓️</i><b>Kalender</b><small>Atur jadwal konten</small></button>
-     </div><div class="notice">✨ <b>Tips:</b> Mulai dengan deskripsi singkat tentang produk atau layanan Anda. Sosify akan membantu menyiapkan konsep konten.</div></div>
-   </div>
-  </section>
-  <section class="page" id="video">
-   <div class="welcome"><div><div class="eyebrow">SOSIFY CREATIVE STUDIO</div><h1>AI Video Studio</h1><p>Buat konsep video dari teks atau gambar. Atur format dan gaya sesuai kebutuhan.</p></div><span class="status">Core feature</span></div>
-   <div class="studio-layout">
-    <div class="card"><div class="cardhead"><h3>Detail video</h3><span>Langkah 1 dari 2</span></div>
-     <div class="formgrid">
-      <div class="field full"><label>Metode pembuatan</label><select id="method"><option>Text to Video</option><option>Image to Video</option><option>Script to Video</option><option>Product Advertisement</option></select></div>
-      <div class="field full"><label>Deskripsikan video yang ingin dibuat</label><textarea id="prompt" placeholder="Contoh: Video iklan sinematik untuk kopi lokal, suasana pagi yang hangat, close-up kopi dituangkan ke cangkir, tampilkan kemasan produk..."></textarea><span class="hint">Jelaskan subjek, suasana, gerakan kamera, dan gaya visual.</span></div>
-      <div class="field"><label>Gaya visual</label><select id="style"><option>Realistic / Cinematic</option><option>3D Animation</option><option>Minimalist</option><option>Commercial Product</option><option>Anime</option></select></div>
-      <div class="field"><label>Durasi</label><select id="duration"><option>5 detik</option><option>10 detik</option><option>15 detik</option><option>30 detik</option></select></div>
-      <div class="field full"><label>Rasio video</label><div class="ratio"><button class="selected" data-ratio="9:16">▯ 9:16<br><small>Reels / TikTok</small></button><button data-ratio="16:9">▭ 16:9<br><small>YouTube</small></button><button data-ratio="1:1">□ 1:1<br><small>Feed</small></button></div></div>
-      <div class="field full"><label>Bahasa narasi (opsional)</label><select><option>Tanpa voice over</option><option>Bahasa Indonesia</option><option>English</option></select></div>
-      <div class="field full"><button class="primary" style="width:100%" id="generate">✦ Buat konsep video</button><span class="hint">Prototype demo: tombol ini belum mengirim permintaan ke provider AI video.</span></div>
-     </div>
-    </div>
-    <div class="card"><div class="cardhead"><h3>Preview proyek</h3><span id="previewratio">9:16</span></div><div class="preview"><div><div class="play">▶</div><b id="previewtitle">Preview video Anda</b><p id="previewdesc">Isi deskripsi lalu buat konsep untuk melihat ringkasan proyek di sini.</p></div></div><div class="notice">ℹ️ Pembuatan file video sungguhan akan diaktifkan setelah API provider video AI dan sistem kredit terhubung.</div></div>
-   </div>
-  </section>
-  <section class="page" id="image"><div class="welcome"><div><div class="eyebrow">CREATIVE STUDIO</div><h1>AI Image Studio</h1><p>Rancang visual promosi dan aset media sosial.</p></div></div><div class="card"><h3>Image Generator</h3><p class="muted">Modul berikutnya dalam roadmap Sosify. Nantinya mendukung text-to-image, variasi visual, dan format sosial media.</p><button class="primary" onclick="toast('Modul AI Image masuk roadmap pengembangan.')">Lihat rencana fitur</button></div></section>
-  <section class="page" id="caption"><div class="welcome"><div><div class="eyebrow">AI WRITING</div><h1>AI Caption Generator</h1><p>Siapkan caption, hashtag, dan ide kampanye.</p></div></div><div class="card"><div class="field"><label>Topik konten</label><textarea placeholder="Ceritakan produk, layanan, atau promosi Anda..."></textarea></div><br><button class="primary" onclick="toast('Generator caption akan diaktifkan setelah koneksi AI API.')">✦ Buat caption</button></div></section>
-  <section class="page" id="calendar"><div class="welcome"><div><div class="eyebrow">PUBLISHING</div><h1>Content Calendar</h1><p>Rencanakan konten dan jadwal publikasi.</p></div></div><div class="card"><h3>Kalender konten</h3><p class="muted">Jadwal konten Anda akan tampil di sini setelah modul scheduler dibangun.</p></div></section>
-  <section class="page" id="social"><div class="welcome"><div><div class="eyebrow">CHANNELS</div><h1>Social Accounts</h1><p>Kelola koneksi akun media sosial.</p></div></div><div class="card"><h3>Hubungkan akun sosial media</h3><p class="muted">Integrasi resmi platform akan ditambahkan setelah proses pendaftaran aplikasi dan persetujuan API.</p><button class="secondary" onclick="toast('Integrasi akun belum aktif pada prototype.')">＋ Hubungkan akun</button></div></section>
-  <section class="page" id="analytics"><div class="welcome"><div><div class="eyebrow">PERFORMANCE</div><h1>Analytics</h1><p>Pantau performa konten dan pertumbuhan channel.</p></div></div><div class="card"><h3>Analitik konten</h3><p class="muted">Data analitik akan tersedia setelah akun media sosial terhubung.</p></div></section>
-  <section class="page" id="billing"><div class="welcome"><div><div class="eyebrow">SUBSCRIPTION</div><h1>Plan & Credits</h1><p>Kelola paket dan penggunaan kredit AI.</p></div></div><div class="card"><h3>Free Plan · Demo</h3><p>100 kredit demo · 68 kredit tersisa</p><div class="progress"><span></span></div><p class="muted">Paket berbayar dan pembayaran akan ditambahkan pada tahap monetisasi.</p></div></section>
-  <section class="page" id="settings"><div class="welcome"><div><div class="eyebrow">PREFERENCES</div><h1>Settings</h1><p>Pengaturan workspace dan profil.</p></div></div><div class="card"><h3>Pengaturan workspace</h3><p class="muted">SOSIFY Workspace · Prototype</p></div></section>
- </div>
-</main>
-</div><div class="toast" id="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./config.js"></script>
+   </section>
+   <section id="projectsTab" class="hidden">
+    <div class="welcome"><div><div class="eyebrow">WORKSPACE</div><h1>Proyek Saya</h1><p>Riwayat konsep video yang tersimpan pada akun Anda.</p></div><button class="primary" id="backStudio">＋ Buat video</button></div>
+    <div class="panel"><div id="projectList">Memuat proyek...</div></div>
+   </section>
+  </div>
+ </main>
+</div>
+<div class="toast" id="toast"></div>
 <script>
-const labels={dashboard:"Dashboard",video:"AI Video Studio",image:"AI Image Studio",caption:"AI Caption",calendar:"Content Calendar",social:"Social Accounts",analytics:"Analytics",billing:"Plan & Credits",settings:"Settings"};
-let supabaseClient=null, currentUser=null, authMode="login";
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));document.getElementById('crumb').textContent=labels[id]||id;window.scrollTo({top:0,behavior:'smooth'})}
-document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
-function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
-let ratio='9:16';document.querySelectorAll('[data-ratio]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-ratio]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');ratio=b.dataset.ratio;document.getElementById('previewratio').textContent=ratio}));
-
-function setAuthMode(mode){
- authMode=mode;
- const signup=mode==="signup";
- document.getElementById('authTitle').textContent=signup?'Buat akun SOSIFY':'Masuk ke SOSIFY';
- document.getElementById('authSubtitle').textContent=signup?'Daftar untuk mulai membuat dan menyimpan proyek konten AI.':'Masuk untuk mengelola studio konten AI Anda.';
- document.getElementById('nameWrap').style.display=signup?'block':'none';
- document.getElementById('authName').required=signup;
- document.getElementById('authSubmit').textContent=signup?'Daftar':'Masuk';
- document.getElementById('authSwitchText').textContent=signup?'Sudah punya akun?':'Belum punya akun?';
- document.getElementById('authSwitch').textContent=signup?'Masuk':'Daftar sekarang';
- document.getElementById('authError').style.display='none';
+const cfg=window.SOSIFY_SUPABASE||{};
+let sb=null,user=null,mode='login',ratio='9:16',loadedImages=[],audioFile=null,raf=null,isRendering=false;
+const $=id=>document.getElementById(id);
+function toast(m){$('toast').textContent=m;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),3500)}
+function authMode(m){mode=m;let s=m==='signup';$('authTitle').textContent=s?'Buat akun SOSIFY':'Masuk ke SOSIFY';$('authSub').textContent=s?'Daftar untuk menyimpan proyek video Anda.':'Masuk untuk membuat dan menyimpan video.';$('nameWrap').classList.toggle('hidden',!s);$('authName').required=s;$('authSubmit').textContent=s?'Daftar':'Masuk';$('switchText').textContent=s?'Sudah punya akun?':'Belum punya akun?';$('switchMode').textContent=s?'Masuk':'Daftar sekarang';$('authError').style.display='none'}
+$('switchMode').onclick=()=>authMode(mode==='login'?'signup':'login');
+function showApp(u){user=u;$('authScreen').classList.add('hidden');$('app').classList.remove('hidden');$('userEmail').textContent=u.email||'';$('avatar').textContent=(u.email||'S')[0].toUpperCase();loadProjects()}
+function showAuth(){$('app').classList.add('hidden');$('authScreen').classList.remove('hidden')}
+async function profile(u){let {error}=await sb.from('profiles').upsert({id:u.id,email:u.email,full_name:u.user_metadata?.full_name||u.email?.split('@')[0]},{onConflict:'id'});if(error)console.warn(error.message)}
+$('authForm').addEventListener('submit',async e=>{e.preventDefault();if(!sb){$('authError').textContent='Konfigurasi Supabase belum lengkap di config.js';$('authError').style.display='block';return}
+ const email=$('authEmail').value.trim(),password=$('authPassword').value;let r;
+ $('authSubmit').disabled=true;
+ try{if(mode==='signup'){r=await sb.auth.signUp({email,password,options:{data:{full_name:$('authName').value.trim()}}});if(r.error)throw r.error;if(r.data.session){await profile(r.data.user);showApp(r.data.user)}else{$('authError').textContent='Pendaftaran berhasil. Periksa email untuk konfirmasi, lalu masuk.';$('authError').style.display='block'}}
+ else{r=await sb.auth.signInWithPassword({email,password});if(r.error)throw r.error;await profile(r.data.user);showApp(r.data.user)}}
+ catch(err){$('authError').textContent=err.message;$('authError').style.display='block'}finally{$('authSubmit').disabled=false}
+});
+$('logoutBtn').onclick=async()=>{await sb?.auth.signOut();showAuth();authMode('login')};
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+$('backStudio').onclick=()=>switchTab('studio');
+function switchTab(t){$('studioTab').classList.toggle('hidden',t!=='studio');$('projectsTab').classList.toggle('hidden',t!=='projects');$('crumb').textContent=t==='studio'?'Free Video Studio':'Proyek Saya';if(t==='projects')loadProjects()}
+document.querySelectorAll('[data-ratio]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-ratio]').forEach(x=>x.classList.remove('active'));b.classList.add('active');ratio=b.dataset.ratio;setCanvasSize();drawFrame(0);$('previewMeta').textContent=ratio+' · siap'});
+function dims(){return ratio==='9:16'?[540,960]:ratio==='16:9'?[960,540]:[720,720]}
+function setCanvasSize(){let [w,h]=dims();$('stage').width=w;$('stage').height=h}
+$('images').onchange=async e=>{loadedImages=[];$('thumbs').innerHTML='';for(const f of [...e.target.files].slice(0,12)){if(!f.type.startsWith('image/'))continue;const url=URL.createObjectURL(f);const im=new Image();im.src=url;await im.decode();loadedImages.push({file:f,img:im,url});let t=document.createElement('img');t.src=url;$('thumbs').append(t)}drawFrame(0)};
+$('music').onchange=e=>{audioFile=e.target.files[0]||null;toast(audioFile?'Musik latar dipilih':'Musik dihapus')};
+function scenes(){let lines=$('scriptText').value.split(/\n+/).map(x=>x.trim()).filter(Boolean);if(!lines.length)lines=['Buat sesuatu yang luar biasa.'];let count=Math.max(lines.length,loadedImages.length,1);return Array.from({length:count},(_,i)=>({text:lines[i%lines.length],image:loadedImages.length?loadedImages[i%loadedImages.length]?.img:null}))}
+function hexStyle(){let s=$('visualStyle').value;return s==='bold'?['#1d123f','#ffcb57']:s==='clean'?['#f4f1ff','#35266e']:s==='soft'?['#24334c','#f5e9df']:['#171326','#ffffff']}
+function drawFrame(t){const c=$('stage'),ctx=c.getContext('2d'),ss=scenes(),dur=Number($('sceneDuration').value),idx=Math.min(ss.length-1,Math.floor(t/dur)),local=(t/dur)-idx,sc=ss[idx],[bg,fg]=hexStyle(),w=c.width,h=c.height;
+ ctx.clearRect(0,0,w,h);let grad=ctx.createLinearGradient(0,0,w,h);grad.addColorStop(0,bg);grad.addColorStop(1,'#7057cb');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+ if(sc.image){let im=sc.image;let scale=Math.max(w/im.width,h/im.height)*(1+local*.10),iw=im.width*scale,ih=im.height*scale;let x=(w-iw)/2-(local-.5)*22,y=(h-ih)/2;ctx.save();ctx.globalAlpha=.85;ctx.drawImage(im,x,y,iw,ih);ctx.restore();let shade=ctx.createLinearGradient(0,h*.25,0,h);shade.addColorStop(0,'#08051a00');shade.addColorStop(1,'#08051aee');ctx.fillStyle=shade;ctx.fillRect(0,0,w,h)}
+ else{ctx.fillStyle='#ffffff12';ctx.beginPath();ctx.arc(w*.78,h*.23,Math.min(w,h)*.28,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffff0c';ctx.fillRect(w*.1,h*.16,w*.8,h*.52)}
+ const maxW=w*.78,fontSize=Math.round(Math.min(w,h)*.072);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=fg;ctx.font=`800 ${fontSize}px system-ui`;let words=sc.text.split(/\s+/),lines=[],line='';for(let word of words){let test=line?line+' '+word:word;if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);
+ let lh=fontSize*1.25,total=lines.length*lh,y0=h*.68-total/2;lines.forEach((ln,i)=>ctx.fillText(ln,w/2,y0+i*lh,maxW));
+ ctx.fillStyle='#ffffffb8';ctx.font=`600 ${Math.round(fontSize*.25)}px system-ui`;ctx.fillText('SOSIFY',w/2,h*.92);
+ ctx.fillStyle='#ffffff70';ctx.fillRect(w*.12,h*.955,w*.76,3);ctx.fillStyle='#ffffff';ctx.fillRect(w*.12,h*.955,w*.76*((idx+local)/ss.length),3);
 }
-document.getElementById('authSwitch').addEventListener('click',()=>setAuthMode(authMode==='login'?'signup':'login'));
-function showApp(user){
- currentUser=user;
- document.getElementById('authScreen').style.display='none';
- document.getElementById('app').style.display='flex';
- const email=user.email||'Pengguna';
- document.getElementById('userEmail').textContent=email;
- document.getElementById('userAvatar').textContent=(email[0]||'U').toUpperCase();
-}
-function showAuth(){
- currentUser=null;
- document.getElementById('app').style.display='none';
- document.getElementById('authScreen').style.display='grid';
-}
-async function loadProfile(user){
- const name=user.user_metadata?.full_name || user.email?.split('@')[0] || 'Pengguna';
- const {error}=await supabaseClient.from('profiles').upsert({id:user.id,full_name:name,email:user.email},{onConflict:'id'});
- if(error) console.warn('Profil belum tersimpan:',error.message);
-}
-document.getElementById('authForm').addEventListener('submit',async(e)=>{
- e.preventDefault();
- const errorBox=document.getElementById('authError');
- errorBox.style.display='none';
- if(!supabaseClient){errorBox.textContent='Konfigurasi Supabase belum diisi. Lengkapi config.js terlebih dahulu.';errorBox.style.display='block';return;}
- const email=document.getElementById('authEmail').value.trim();
- const password=document.getElementById('authPassword').value;
- const submit=document.getElementById('authSubmit');submit.disabled=true;submit.textContent='Memproses...';
+function totalDuration(){return scenes().length*Number($('sceneDuration').value)}
+function preview(){if(raf)cancelAnimationFrame(raf);let start=performance.now(),total=totalDuration()*1000;function tick(now){let elapsed=now-start;if(elapsed>=total){drawFrame(total/1000-.01);raf=null;return}drawFrame(elapsed/1000);raf=requestAnimationFrame(tick)}raf=requestAnimationFrame(tick)}
+$('previewBtn').onclick=()=>{drawFrame(0);preview();toast('Preview diputar di canvas.');};
+async function saveProject(status){if(!sb||!user)return null;let prompt=$('scriptText').value.trim();let payload={user_id:user.id,title:$('projectTitle').value.trim()||'Video SOSIFY',prompt,method:$('contentType').value,visual_style:$('visualStyle').value,duration:`${totalDuration()} detik`,aspect_ratio:ratio,status};let {data,error}=await sb.from('video_projects').insert(payload).select().single();if(error)throw error;return data}
+async function renderVideo(){
+ if(isRendering)return;isRendering=true;$('renderBtn').disabled=true;$('previewBtn').disabled=true;
  try{
-  if(authMode==='signup'){
-   const full_name=document.getElementById('authName').value.trim();
-   const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name}}});
-   if(error) throw error;
-   if(data.session){await loadProfile(data.user);showApp(data.user);}
-   else {errorBox.textContent='Pendaftaran berhasil. Periksa email untuk konfirmasi, lalu masuk ke SOSIFY.';errorBox.style.display='block';}
-  }else{
-   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-   if(error) throw error;
-   await loadProfile(data.user);showApp(data.user);
-  }
- }catch(err){errorBox.textContent=err.message||'Terjadi kesalahan.';errorBox.style.display='block';}
- finally{submit.disabled=false;submit.textContent=authMode==='signup'?'Daftar':'Masuk';}
-});
-document.getElementById('logoutBtn').addEventListener('click',async()=>{
- if(supabaseClient) await supabaseClient.auth.signOut();
- showAuth();setAuthMode('login');
-});
-document.getElementById('generate').addEventListener('click',async()=>{
- const p=document.getElementById('prompt').value.trim();
- if(!p){toast('Silakan isi deskripsi video terlebih dahulu.');return}
- if(!currentUser){toast('Silakan masuk terlebih dahulu.');return}
- const payload={
-  user_id:currentUser.id,
-  title:p.slice(0,70),
-  prompt:p,
-  method:document.getElementById('method').value,
-  visual_style:document.getElementById('style').value,
-  duration:document.getElementById('duration').value,
-  aspect_ratio:ratio,
-  status:'draft'
- };
- const btn=document.getElementById('generate');btn.disabled=true;btn.textContent='Menyimpan...';
- const {error}=await supabaseClient.from('video_projects').insert(payload);
- btn.disabled=false;btn.textContent='✦ Buat konsep video';
- if(error){toast('Gagal menyimpan: '+error.message);return;}
- document.getElementById('previewtitle').textContent='Konsep video tersimpan';
- document.getElementById('previewdesc').textContent=p.slice(0,150)+(p.length>150?'…':'')+' · '+payload.duration+' · '+ratio;
- toast('Proyek video berhasil disimpan ke akun Anda.');
-});
-
-(async function init(){
- const cfg=window.SOSIFY_SUPABASE||{};
- if(!cfg.url||!cfg.anonKey||cfg.anonKey.includes('TEMPEL_')){showAuth();return;}
- supabaseClient=window.supabase.createClient(cfg.url,cfg.anonKey);
- const {data:{session}}=await supabaseClient.auth.getSession();
- if(session){await loadProfile(session.user);showApp(session.user);}else showAuth();
- supabaseClient.auth.onAuthStateChange(async(event,session)=>{
-  if(session){showApp(session.user);}else if(event==='SIGNED_OUT'){showAuth();}
- });
+  const c=$('stage'),ctx=c.getContext('2d'),ss=scenes(),dur=Number($('sceneDuration').value),total=ss.length*dur;
+  drawFrame(0);
+  let stream=c.captureStream(30),audioCtx=null,source=null,dest=null,audioEl=null;
+  if(audioFile){audioCtx=new AudioContext();dest=audioCtx.createMediaStreamDestination();audioEl=new Audio(URL.createObjectURL(audioFile));audioEl.loop=true;source=audioCtx.createMediaElementSource(audioEl);source.connect(dest);source.connect(audioCtx.destination);dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));await audioCtx.resume();await audioEl.play()}
+  let mime=['video/mp4;codecs=h264,aac','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus'].find(x=>MediaRecorder.isTypeSupported(x))||'';
+  let recorder=new MediaRecorder(stream,mime?{mimeType:mime}:undefined),chunks=[];recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  let done=new Promise((resolve,reject)=>{recorder.onstop=resolve;recorder.onerror=e=>reject(e.error||new Error('Render gagal'))});
+  recorder.start(250);$('renderStatus').textContent='Sedang merender...';let start=performance.now();
+  await new Promise(resolve=>{function frame(now){let elapsed=(now-start)/1000;drawFrame(Math.min(elapsed,total-.01));let pct=Math.min(100,elapsed/total*100);$('progress').style.width=pct+'%';$('timeLabel').textContent=Math.round(pct)+'%';if(elapsed>=total)resolve();else requestAnimationFrame(frame)}requestAnimationFrame(frame)});
+  recorder.stop();await done;stream.getTracks().forEach(t=>t.stop());if(audioCtx)await audioCtx.close();if(audioEl){audioEl.pause();URL.revokeObjectURL(audioEl.src)}
+  const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'}),ext=(recorder.mimeType||'').includes('mp4')?'mp4':'webm',url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(($('projectTitle').value||'sosify-video').replace(/[^a-z0-9-_]+/gi,'-'))+'.'+ext;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  await saveProject('rendered');$('renderStatus').textContent='Selesai · file diunduh';$('progress').style.width='100%';$('timeLabel').textContent='100%';toast('Video berhasil dirender dan proyek tersimpan.');
+ }catch(err){console.error(err);$('renderStatus').textContent='Render gagal';toast('Render gagal: '+(err.message||err));}
+ finally{isRendering=false;$('renderBtn').disabled=false;$('previewBtn').disabled=false}
+}
+$('renderBtn').onclick=renderVideo;
+async function loadProjects(){if(!sb||!user)return;$('projectList').textContent='Memuat proyek...';let {data,error}=await sb.from('video_projects').select('id,title,method,duration,aspect_ratio,status,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50);if(error){$('projectList').textContent='Gagal memuat: '+error.message;return}if(!data.length){$('projectList').textContent='Belum ada proyek. Buat video pertama Anda di Free Video Studio.';return}$('projectList').innerHTML='';for(let p of data){let row=document.createElement('div');row.className='projectrow';let icon=document.createElement('div');icon.className='projecticon';icon.textContent='🎬';let info=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('small');b.textContent=p.title;sm.textContent=`${p.method} · ${p.duration||''} · ${p.aspect_ratio||''} · ${new Date(p.created_at).toLocaleString('id-ID')}`;info.append(b,sm);let pill=document.createElement('span');pill.className='pill';pill.textContent=p.status||'draft';row.append(icon,info,pill);$('projectList').append(row)}}
+function initCanvas(){setCanvasSize();drawFrame(0)}
+(async()=>{initCanvas();if(!cfg.url||!cfg.anonKey||cfg.anonKey.includes('TEMPEL_')){showAuth();$('authError').textContent='Lengkapi config.js dengan Supabase Publishable key.';$('authError').style.display='block';return}
+ sb=window.supabase.createClient(cfg.url,cfg.anonKey);let {data:{session}}=await sb.auth.getSession();if(session){await profile(session.user);showApp(session.user)}else showAuth();sb.auth.onAuthStateChange((ev,s)=>{if(s)showApp(s.user);else if(ev==='SIGNED_OUT')showAuth()});
 })();
 </script>
-
 </body></html>

@@ -14,10 +14,34 @@ main{flex:1;min-width:0}.topbar{height:76px;background:#fff;border-bottom:1px so
 .page{display:none}.page.active{display:block}.studio-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:700}.field input,.field textarea,.field select{width:100%;border:1px solid #e4e3ed;border-radius:9px;padding:11px 12px;font:inherit;background:#fff;color:var(--ink)}.field textarea{min-height:105px;resize:vertical}.hint{font-size:10px;color:var(--muted)}.ratio{display:flex;gap:8px}.ratio button{flex:1;border:1px solid var(--line);background:white;border-radius:9px;padding:9px;cursor:pointer}.ratio button.selected{border-color:var(--purple);background:#f4f1ff;color:#5b42d6;font-weight:700}.preview{background:#f3f1fb;border:1px dashed #c9c1ef;border-radius:13px;min-height:275px;display:grid;place-items:center;text-align:center;padding:20px}.preview .play{width:54px;height:54px;border-radius:50%;background:#fff;color:var(--purple);display:grid;place-items:center;margin:0 auto 12px;font-size:20px;box-shadow:0 5px 20px #34256b18}.preview p{color:var(--muted);font-size:12px;max-width:230px}.notice{background:#fff8e9;border:1px solid #f4e5c2;border-radius:10px;padding:11px 13px;color:#79591b;font-size:11px;margin-top:14px}.toast{position:fixed;bottom:22px;right:22px;background:#201b3b;color:white;padding:13px 17px;border-radius:11px;box-shadow:0 10px 30px #0002;display:none;z-index:10}.toast.show{display:block}
 @media(max-width:900px){.sidebar{width:210px}.stats{grid-template-columns:repeat(2,1fr)}.grid2,.studio-layout{grid-template-columns:1fr}.content{padding:24px}.topbar{padding:0 24px}}
 @media(max-width:640px){.sidebar{width:65px;padding:20px 8px}.brand{padding:0;justify-content:center}.brand>div:last-child,.navlabel,.nav button span:not(.ico),.sidebottom{display:none}.nav button{justify-content:center;padding:12px 4px}.topbar{padding:0 15px}.content{padding:20px 14px}.welcome{display:block}.welcome .primary{margin-top:12px}.stats{gap:9px}.stat{padding:12px}.stat strong{font-size:21px}.grid2{gap:12px}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+
+.auth-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 20% 10%,#e9e3ff,transparent 35%),#f6f7fb}
+.auth-card{width:min(100%,440px);background:#fff;border:1px solid #ececf3;border-radius:20px;padding:30px;box-shadow:0 18px 60px #24184b12}
+.auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.auth-logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#a18cff,#6546ee);display:grid;place-items:center;color:white;font-weight:900;font-size:22px}
+.auth-card h1{margin:0 0 6px;font-size:24px}.auth-card p{color:#777991;margin:0 0 22px}.auth-card label{display:block;font-weight:700;font-size:12px;margin:13px 0 6px}.auth-card input{width:100%;padding:12px;border:1px solid #e4e3ed;border-radius:9px;font:inherit}.auth-card button{width:100%;margin-top:17px}.auth-switch{text-align:center;margin-top:16px;font-size:12px;color:#777991}.auth-switch a{color:#6546ee;font-weight:700;cursor:pointer}.auth-error{display:none;background:#fff0f0;color:#a32c2c;border-radius:9px;padding:10px;font-size:12px;margin-top:12px}.auth-note{font-size:11px;color:#777991;margin-top:15px}.user-email{font-size:12px;color:#777991}
+
 </style>
 </head>
 <body>
-<div class="app">
+
+<div class="auth-screen" id="authScreen">
+ <div class="auth-card">
+  <div class="auth-brand"><div class="auth-logo">S</div><div><b style="font-size:21px;letter-spacing:1.3px">SOSIFY</b><div style="font-size:10px;color:#777991;letter-spacing:1.2px">CREATE · AUTOMATE · GROW</div></div></div>
+  <h1 id="authTitle">Masuk ke SOSIFY</h1>
+  <p id="authSubtitle">Masuk untuk mengelola studio konten AI Anda.</p>
+  <form id="authForm">
+   <div id="nameWrap" style="display:none"><label for="authName">Nama</label><input id="authName" autocomplete="name" placeholder="Nama Anda"></div>
+   <label for="authEmail">Email</label><input id="authEmail" type="email" required autocomplete="email" placeholder="nama@email.com">
+   <label for="authPassword">Password</label><input id="authPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="Minimal 6 karakter">
+   <button class="primary" id="authSubmit" type="submit">Masuk</button>
+   <div class="auth-error" id="authError"></div>
+  </form>
+  <div class="auth-switch"><span id="authSwitchText">Belum punya akun?</span> <a id="authSwitch">Daftar sekarang</a></div>
+  <div class="auth-note">Akun Anda diamankan menggunakan Supabase Authentication.</div>
+ </div>
+</div>
+
+<div class="app" id="app" style="display:none">
 <aside class="sidebar">
  <div class="brand"><div class="logo">S</div><div><b>SOSIFY</b><small>CREATE · AUTOMATE · GROW</small></div></div>
  <div><div class="navlabel">WORKSPACE</div><nav class="nav">
@@ -36,7 +60,7 @@ main{flex:1;min-width:0}.topbar{height:76px;background:#fff;border-bottom:1px so
  <div class="sidebottom"><b>Free Plan</b><p>Anda menggunakan 32 dari 100 kredit demo.</p><div class="progress"><span></span></div></div>
 </aside>
 <main>
- <header class="topbar"><div class="crumb">Workspace / <b id="crumb">Dashboard</b></div><div class="topright"><button class="iconbtn" title="Notifikasi">♧</button><div class="avatar">U</div></div></header>
+ <header class="topbar"><div class="crumb">Workspace / <b id="crumb">Dashboard</b></div><div class="topright"><span class="user-email" id="userEmail"></span><button class="secondary" id="logoutBtn" style="padding:8px 11px">Keluar</button><div class="avatar" id="userAvatar">U</div></div></header>
  <div class="content">
   <section class="page active" id="dashboard">
    <div class="welcome"><div><div class="eyebrow">SOSIFY WORKSPACE</div><h1>Selamat datang di Sosify 👋</h1><p>Studio AI untuk membuat, mengelola, dan mengembangkan konten sosial media Anda.</p></div><button class="primary" onclick="showPage('video')">＋ Buat video AI</button></div>
@@ -90,12 +114,108 @@ main{flex:1;min-width:0}.topbar{height:76px;background:#fff;border-bottom:1px so
  </div>
 </main>
 </div><div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./config.js"></script>
 <script>
 const labels={dashboard:"Dashboard",video:"AI Video Studio",image:"AI Image Studio",caption:"AI Caption",calendar:"Content Calendar",social:"Social Accounts",analytics:"Analytics",billing:"Plan & Credits",settings:"Settings"};
+let supabaseClient=null, currentUser=null, authMode="login";
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));document.getElementById('crumb').textContent=labels[id]||id;window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
 let ratio='9:16';document.querySelectorAll('[data-ratio]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-ratio]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');ratio=b.dataset.ratio;document.getElementById('previewratio').textContent=ratio}));
-document.getElementById('generate').addEventListener('click',()=>{let p=document.getElementById('prompt').value.trim();if(!p){toast('Silakan isi deskripsi video terlebih dahulu.');return}document.getElementById('previewtitle').textContent='Konsep video siap ditinjau';document.getElementById('previewdesc').textContent=p.slice(0,150)+(p.length>150?'…':'')+' · '+document.getElementById('duration').value+' · '+ratio;toast('Konsep proyek berhasil disiapkan dalam prototype.')});
+
+function setAuthMode(mode){
+ authMode=mode;
+ const signup=mode==="signup";
+ document.getElementById('authTitle').textContent=signup?'Buat akun SOSIFY':'Masuk ke SOSIFY';
+ document.getElementById('authSubtitle').textContent=signup?'Daftar untuk mulai membuat dan menyimpan proyek konten AI.':'Masuk untuk mengelola studio konten AI Anda.';
+ document.getElementById('nameWrap').style.display=signup?'block':'none';
+ document.getElementById('authName').required=signup;
+ document.getElementById('authSubmit').textContent=signup?'Daftar':'Masuk';
+ document.getElementById('authSwitchText').textContent=signup?'Sudah punya akun?':'Belum punya akun?';
+ document.getElementById('authSwitch').textContent=signup?'Masuk':'Daftar sekarang';
+ document.getElementById('authError').style.display='none';
+}
+document.getElementById('authSwitch').addEventListener('click',()=>setAuthMode(authMode==='login'?'signup':'login'));
+function showApp(user){
+ currentUser=user;
+ document.getElementById('authScreen').style.display='none';
+ document.getElementById('app').style.display='flex';
+ const email=user.email||'Pengguna';
+ document.getElementById('userEmail').textContent=email;
+ document.getElementById('userAvatar').textContent=(email[0]||'U').toUpperCase();
+}
+function showAuth(){
+ currentUser=null;
+ document.getElementById('app').style.display='none';
+ document.getElementById('authScreen').style.display='grid';
+}
+async function loadProfile(user){
+ const name=user.user_metadata?.full_name || user.email?.split('@')[0] || 'Pengguna';
+ const {error}=await supabaseClient.from('profiles').upsert({id:user.id,full_name:name,email:user.email},{onConflict:'id'});
+ if(error) console.warn('Profil belum tersimpan:',error.message);
+}
+document.getElementById('authForm').addEventListener('submit',async(e)=>{
+ e.preventDefault();
+ const errorBox=document.getElementById('authError');
+ errorBox.style.display='none';
+ if(!supabaseClient){errorBox.textContent='Konfigurasi Supabase belum diisi. Lengkapi config.js terlebih dahulu.';errorBox.style.display='block';return;}
+ const email=document.getElementById('authEmail').value.trim();
+ const password=document.getElementById('authPassword').value;
+ const submit=document.getElementById('authSubmit');submit.disabled=true;submit.textContent='Memproses...';
+ try{
+  if(authMode==='signup'){
+   const full_name=document.getElementById('authName').value.trim();
+   const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name}}});
+   if(error) throw error;
+   if(data.session){await loadProfile(data.user);showApp(data.user);}
+   else {errorBox.textContent='Pendaftaran berhasil. Periksa email untuk konfirmasi, lalu masuk ke SOSIFY.';errorBox.style.display='block';}
+  }else{
+   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+   if(error) throw error;
+   await loadProfile(data.user);showApp(data.user);
+  }
+ }catch(err){errorBox.textContent=err.message||'Terjadi kesalahan.';errorBox.style.display='block';}
+ finally{submit.disabled=false;submit.textContent=authMode==='signup'?'Daftar':'Masuk';}
+});
+document.getElementById('logoutBtn').addEventListener('click',async()=>{
+ if(supabaseClient) await supabaseClient.auth.signOut();
+ showAuth();setAuthMode('login');
+});
+document.getElementById('generate').addEventListener('click',async()=>{
+ const p=document.getElementById('prompt').value.trim();
+ if(!p){toast('Silakan isi deskripsi video terlebih dahulu.');return}
+ if(!currentUser){toast('Silakan masuk terlebih dahulu.');return}
+ const payload={
+  user_id:currentUser.id,
+  title:p.slice(0,70),
+  prompt:p,
+  method:document.getElementById('method').value,
+  visual_style:document.getElementById('style').value,
+  duration:document.getElementById('duration').value,
+  aspect_ratio:ratio,
+  status:'draft'
+ };
+ const btn=document.getElementById('generate');btn.disabled=true;btn.textContent='Menyimpan...';
+ const {error}=await supabaseClient.from('video_projects').insert(payload);
+ btn.disabled=false;btn.textContent='✦ Buat konsep video';
+ if(error){toast('Gagal menyimpan: '+error.message);return;}
+ document.getElementById('previewtitle').textContent='Konsep video tersimpan';
+ document.getElementById('previewdesc').textContent=p.slice(0,150)+(p.length>150?'…':'')+' · '+payload.duration+' · '+ratio;
+ toast('Proyek video berhasil disimpan ke akun Anda.');
+});
+
+(async function init(){
+ const cfg=window.SOSIFY_SUPABASE||{};
+ if(!cfg.url||!cfg.anonKey||cfg.anonKey.includes('TEMPEL_')){showAuth();return;}
+ supabaseClient=window.supabase.createClient(cfg.url,cfg.anonKey);
+ const {data:{session}}=await supabaseClient.auth.getSession();
+ if(session){await loadProfile(session.user);showApp(session.user);}else showAuth();
+ supabaseClient.auth.onAuthStateChange(async(event,session)=>{
+  if(session){showApp(session.user);}else if(event==='SIGNED_OUT'){showAuth();}
+ });
+})();
 </script>
+
 </body></html>

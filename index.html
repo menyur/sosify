@@ -27,7 +27,7 @@ main{flex:1;min-width:0}.topbar{height:70px;background:#fff;border-bottom:1px so
 canvas{max-width:100%;max-height:68vh;background:#151326;border-radius:5px;box-shadow:0 8px 25px #17132620}
 .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.controls button{border-radius:9px}.timeline{margin-top:15px}.timelinehead{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:7px}.progress{height:7px;border-radius:20px;background:#e9e7f0;overflow:hidden}.progress span{display:block;height:100%;width:0;background:var(--purple);transition:width .2s}
 .notice{background:#fff8e9;border:1px solid #f4e5c2;border-radius:10px;padding:10px 12px;color:#79591b;font-size:11px;margin-top:12px}
-.projects{margin-top:18px}.projectrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.projecticon{width:42px;height:42px;background:#f0edff;border-radius:10px;display:grid;place-items:center;font-size:18px}.projectrow small{display:block;color:var(--muted)}.pill{margin-left:auto;background:#e8f8f1;color:var(--green);padding:4px 9px;border-radius:20px;font-size:10px}
+.projects{margin-top:18px}.projectrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.projecticon{width:42px;height:42px;background:#f0edff;border-radius:10px;display:grid;place-items:center;font-size:18px}.projectrow small{display:block;color:var(--muted)}.projectactions{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap}.projectactions button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 10px;font-size:11px;font-weight:650;color:#39384d}.projectactions button.edit{border-color:#d9d1ff;background:#f7f5ff;color:#5b42d6}.projectactions button.delete{color:#a32c2c}.projectnotice{background:#f7f6ff;border:1px solid #e5e0ff;border-radius:10px;padding:11px 13px;color:#514879;font-size:11px;margin-bottom:14px}.pill{margin-left:0;background:#e8f8f1;color:var(--green);padding:4px 9px;border-radius:20px;font-size:10px}
 .toast{position:fixed;bottom:20px;right:20px;background:#201b3b;color:white;padding:12px 16px;border-radius:11px;display:none;z-index:10;max-width:min(90vw,420px)}.toast.show{display:block}
 @media(max-width:980px){.studio{grid-template-columns:1fr}.canvasbox{min-height:320px}}
 @media(max-width:650px){.sidebar{width:64px;padding:18px 7px}.brand .brandtext,.navlabel,.nav button span:not(.ico),.sidefoot{display:none}.brand{justify-content:center}.nav button{justify-content:center;padding:12px 4px}.topbar{padding:0 12px}.content{padding:18px 12px}.welcome{display:block}.two{grid-template-columns:1fr}.canvasbox{min-height:260px}}
@@ -88,7 +88,7 @@ Mulai sekarang bersama kami!</textarea><div class="hint">Pisahkan setiap adegan 
    </section>
    <section id="projectsTab" class="hidden">
     <div class="welcome"><div><div class="eyebrow">WORKSPACE</div><h1>Proyek Saya</h1><p>Riwayat konsep video yang tersimpan pada akun Anda.</p></div><button class="primary" id="backStudio">＋ Buat video</button></div>
-    <div class="panel"><div id="projectList">Memuat proyek...</div></div>
+    <div class="panel"><div class="projectnotice">Riwayat menyimpan judul, naskah, pengaturan, dan status proyek. File video tetap tersimpan di perangkat saat diunduh; foto dan file video belum diunggah ke penyimpanan cloud.</div><div id="projectList">Memuat proyek...</div></div>
    </section>
   </div>
  </main>
@@ -96,7 +96,7 @@ Mulai sekarang bersama kami!</textarea><div class="hint">Pisahkan setiap adegan 
 <div class="toast" id="toast"></div>
 <script>
 const cfg=window.SOSIFY_SUPABASE||{};
-let sb=null,user=null,mode='login',ratio='9:16',loadedImages=[],audioFile=null,raf=null,isRendering=false;
+let sb=null,user=null,mode='login',ratio='9:16',loadedImages=[],audioFile=null,raf=null,isRendering=false,editingProjectId=null;
 const $=id=>document.getElementById(id);
 function toast(m){$('toast').textContent=m;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),3500)}
 function authMode(m){mode=m;let s=m==='signup';$('authTitle').textContent=s?'Buat akun SOSIFY':'Masuk ke SOSIFY';$('authSub').textContent=s?'Daftar untuk menyimpan proyek video Anda.':'Masuk untuk membuat dan menyimpan video.';$('nameWrap').classList.toggle('hidden',!s);$('authName').required=s;$('authSubmit').textContent=s?'Daftar':'Masuk';$('switchText').textContent=s?'Sudah punya akun?':'Belum punya akun?';$('switchMode').textContent=s?'Masuk':'Daftar sekarang';$('authError').style.display='none'}
@@ -113,7 +113,7 @@ $('authForm').addEventListener('submit',async e=>{e.preventDefault();if(!sb){$('
 });
 $('logoutBtn').onclick=async()=>{await sb?.auth.signOut();showAuth();authMode('login')};
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
-$('backStudio').onclick=()=>switchTab('studio');
+$('backStudio').onclick=()=>{editingProjectId=null;$('projectTitle').value='Video promosi saya';$('scriptText').value='';$('images').value='';$('thumbs').innerHTML='';loadedImages.forEach(x=>{try{URL.revokeObjectURL(x.url)}catch(e){}});loadedImages=[];audioFile=null;$('music').value='';drawFrame(0);switchTab('studio')};
 function switchTab(t){$('studioTab').classList.toggle('hidden',t!=='studio');$('projectsTab').classList.toggle('hidden',t!=='projects');$('crumb').textContent=t==='studio'?'Free Video Studio':'Proyek Saya';if(t==='projects')loadProjects()}
 document.querySelectorAll('[data-ratio]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-ratio]').forEach(x=>x.classList.remove('active'));b.classList.add('active');ratio=b.dataset.ratio;setCanvasSize();drawFrame(0);$('previewMeta').textContent=ratio+' · siap'});
 function dims(){return ratio==='9:16'?[540,960]:ratio==='16:9'?[960,540]:[720,720]}
@@ -134,7 +134,18 @@ function drawFrame(t){const c=$('stage'),ctx=c.getContext('2d'),ss=scenes(),dur=
 function totalDuration(){return scenes().length*Number($('sceneDuration').value)}
 function preview(){if(raf)cancelAnimationFrame(raf);let start=performance.now(),total=totalDuration()*1000;function tick(now){let elapsed=now-start;if(elapsed>=total){drawFrame(total/1000-.01);raf=null;return}drawFrame(elapsed/1000);raf=requestAnimationFrame(tick)}raf=requestAnimationFrame(tick)}
 $('previewBtn').onclick=()=>{drawFrame(0);preview();toast('Preview diputar di canvas.');};
-async function saveProject(status){if(!sb||!user)return null;let prompt=$('scriptText').value.trim();let payload={user_id:user.id,title:$('projectTitle').value.trim()||'Video SOSIFY',prompt,method:$('contentType').value,visual_style:$('visualStyle').value,duration:`${totalDuration()} detik`,aspect_ratio:ratio,status};let {data,error}=await sb.from('video_projects').insert(payload).select().single();if(error)throw error;return data}
+async function saveProject(status){
+ if(!sb||!user)return null;
+ let prompt=$('scriptText').value.trim();
+ let payload={user_id:user.id,title:$('projectTitle').value.trim()||'Video SOSIFY',prompt,method:$('contentType').value,visual_style:$('visualStyle').value,duration:`${totalDuration()} detik`,aspect_ratio:ratio,status,updated_at:new Date().toISOString()};
+ let query=editingProjectId
+  ? sb.from('video_projects').update(payload).eq('id',editingProjectId).eq('user_id',user.id)
+  : sb.from('video_projects').insert(payload);
+ let {data,error}=await query.select().single();
+ if(error)throw error;
+ editingProjectId=data.id;
+ return data;
+}
 async function renderVideo(){
  if(isRendering)return;
  isRendering=true;
@@ -219,7 +230,58 @@ async function renderVideo(){
  }
 }
 $('renderBtn').onclick=renderVideo;
-async function loadProjects(){if(!sb||!user)return;$('projectList').textContent='Memuat proyek...';let {data,error}=await sb.from('video_projects').select('id,title,method,duration,aspect_ratio,status,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50);if(error){$('projectList').textContent='Gagal memuat: '+error.message;return}if(!data.length){$('projectList').textContent='Belum ada proyek. Buat video pertama Anda di Free Video Studio.';return}$('projectList').innerHTML='';for(let p of data){let row=document.createElement('div');row.className='projectrow';let icon=document.createElement('div');icon.className='projecticon';icon.textContent='🎬';let info=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('small');b.textContent=p.title;sm.textContent=`${p.method} · ${p.duration||''} · ${p.aspect_ratio||''} · ${new Date(p.created_at).toLocaleString('id-ID')}`;info.append(b,sm);let pill=document.createElement('span');pill.className='pill';pill.textContent=p.status||'draft';row.append(icon,info,pill);$('projectList').append(row)}}
+async function loadProjects(){
+ if(!sb||!user)return;
+ $('projectList').textContent='Memuat proyek...';
+ let {data,error}=await sb.from('video_projects')
+  .select('id,title,prompt,method,visual_style,duration,aspect_ratio,status,created_at,updated_at')
+  .eq('user_id',user.id).order('created_at',{ascending:false}).limit(50);
+ if(error){$('projectList').textContent='Gagal memuat: '+error.message;return}
+ if(!data.length){$('projectList').textContent='Belum ada proyek. Buat video pertama Anda di Free Video Studio.';return}
+ $('projectList').innerHTML='';
+ for(let p of data){
+  let row=document.createElement('div');row.className='projectrow';
+  let icon=document.createElement('div');icon.className='projecticon';icon.textContent='🎬';
+  let info=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('small');
+  b.textContent=p.title||'Video SOSIFY';
+  sm.textContent=`${p.method||'slideshow'} · ${p.duration||''} · ${p.aspect_ratio||''} · ${new Date(p.created_at).toLocaleString('id-ID')}`;
+  info.append(b,sm);
+  let actions=document.createElement('div');actions.className='projectactions';
+  let status=document.createElement('span');status.className='pill';status.textContent=p.status||'draft';
+  let edit=document.createElement('button');edit.className='edit';edit.type='button';edit.textContent='Edit';
+  edit.onclick=()=>editProject(p);
+  let del=document.createElement('button');del.className='delete';del.type='button';del.textContent='Hapus';
+  del.onclick=()=>deleteProject(p);
+  actions.append(status,edit,del);row.append(icon,info,actions);$('projectList').append(row);
+ }
+}
+function editProject(p){
+ editingProjectId=p.id;
+ $('projectTitle').value=p.title||'Video SOSIFY';
+ $('scriptText').value=p.prompt||'';
+ if([...$('contentType').options].some(o=>o.value===p.method))$('contentType').value=p.method;
+ if([...$('visualStyle').options].some(o=>o.value===p.visual_style))$('visualStyle').value=p.visual_style;
+ let count=Math.max(1,$('scriptText').value.split(/\n+/).filter(x=>x.trim()).length);
+ let seconds=parseInt(p.duration,10)||count*4;
+ let perScene=Math.max(3,Math.min(6,Math.round(seconds/count)));
+ $('sceneDuration').value=String(perScene);
+ ratio=['9:16','16:9','1:1'].includes(p.aspect_ratio)?p.aspect_ratio:'9:16';
+ document.querySelectorAll('[data-ratio]').forEach(x=>x.classList.toggle('active',x.dataset.ratio===ratio));
+ loadedImages.forEach(x=>{try{URL.revokeObjectURL(x.url)}catch(e){}});
+ loadedImages=[];$('images').value='';$('thumbs').innerHTML='';
+ audioFile=null;$('music').value='';
+ setCanvasSize();drawFrame(0);$('previewMeta').textContent=ratio+' · mode edit';
+ switchTab('studio');
+ toast('Proyek dimuat. Foto dan musik perlu dipilih ulang karena file aslinya tidak disimpan di riwayat.');
+}
+async function deleteProject(p){
+ if(!confirm(`Hapus proyek "${p.title}" dari riwayat SOSIFY?`))return;
+ let {error}=await sb.from('video_projects').delete().eq('id',p.id).eq('user_id',user.id);
+ if(error){toast('Gagal menghapus proyek: '+error.message);return}
+ if(editingProjectId===p.id)editingProjectId=null;
+ toast('Proyek berhasil dihapus dari riwayat.');
+ await loadProjects();
+}
 function initCanvas(){setCanvasSize();drawFrame(0)}
 (async()=>{initCanvas();if(!cfg.url||!cfg.anonKey||cfg.anonKey.includes('TEMPEL_')){showAuth();$('authError').textContent='Lengkapi config.js dengan Supabase Publishable key.';$('authError').style.display='block';return}
  sb=window.supabase.createClient(cfg.url,cfg.anonKey);let {data:{session}}=await sb.auth.getSession();if(session){await profile(session.user);showApp(session.user)}else showAuth();sb.auth.onAuthStateChange((ev,s)=>{if(s)showApp(s.user);else if(ev==='SIGNED_OUT')showAuth()});

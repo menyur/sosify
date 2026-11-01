@@ -136,22 +136,87 @@ function preview(){if(raf)cancelAnimationFrame(raf);let start=performance.now(),
 $('previewBtn').onclick=()=>{drawFrame(0);preview();toast('Preview diputar di canvas.');};
 async function saveProject(status){if(!sb||!user)return null;let prompt=$('scriptText').value.trim();let payload={user_id:user.id,title:$('projectTitle').value.trim()||'Video SOSIFY',prompt,method:$('contentType').value,visual_style:$('visualStyle').value,duration:`${totalDuration()} detik`,aspect_ratio:ratio,status};let {data,error}=await sb.from('video_projects').insert(payload).select().single();if(error)throw error;return data}
 async function renderVideo(){
- if(isRendering)return;isRendering=true;$('renderBtn').disabled=true;$('previewBtn').disabled=true;
+ if(isRendering)return;
+ isRendering=true;
+ const btn=$('renderBtn'),previewBtn=$('previewBtn'),status=$('renderStatus'),bar=$('progress'),label=$('timeLabel');
+ let stream=null,recorder=null,audioCtx=null,audioEl=null,rafId=null;
+ const cleanup=async()=>{
+  if(rafId)cancelAnimationFrame(rafId);
+  try{if(recorder&&recorder.state!=='inactive')recorder.stop()}catch(e){}
+  try{if(stream)stream.getTracks().forEach(t=>t.stop())}catch(e){}
+  try{if(audioEl){audioEl.pause();audioEl.removeAttribute('src');audioEl.load()}}catch(e){}
+  try{if(audioCtx&&audioCtx.state!=='closed')await audioCtx.close()}catch(e){}
+ };
+ btn.disabled=true;previewBtn.disabled=true;
+ bar.style.width='0%';label.textContent='0%';
  try{
-  const c=$('stage'),ctx=c.getContext('2d'),ss=scenes(),dur=Number($('sceneDuration').value),total=ss.length*dur;
+  status.textContent='Memeriksa dukungan browser...';
+  const c=$('stage');
+  if(!c||typeof c.captureStream!=='function')throw new Error('Browser tidak mendukung perekaman canvas. Gunakan Chrome/Edge desktop terbaru.');
+  if(typeof MediaRecorder==='undefined')throw new Error('MediaRecorder tidak tersedia. Perbarui Chrome atau coba Edge.');
+  if(!MediaRecorder.isTypeSupported('video/webm')&&!MediaRecorder.isTypeSupported('video/mp4'))throw new Error('Browser tidak menyediakan format video yang didukung.');
+  const ss=scenes(),dur=Number($('sceneDuration').value),total=Math.max(1,ss.length*dur);
+  if(!Number.isFinite(total)||total<=0)throw new Error('Durasi video tidak valid. Periksa durasi scene.');
+  status.textContent='Menyiapkan video...';
   drawFrame(0);
-  let stream=c.captureStream(30),audioCtx=null,source=null,dest=null,audioEl=null;
-  if(audioFile){audioCtx=new AudioContext();dest=audioCtx.createMediaStreamDestination();audioEl=new Audio(URL.createObjectURL(audioFile));audioEl.loop=true;source=audioCtx.createMediaElementSource(audioEl);source.connect(dest);source.connect(audioCtx.destination);dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));await audioCtx.resume();await audioEl.play()}
-  let mime=['video/mp4;codecs=h264,aac','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus'].find(x=>MediaRecorder.isTypeSupported(x))||'';
-  let recorder=new MediaRecorder(stream,mime?{mimeType:mime}:undefined),chunks=[];recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
-  let done=new Promise((resolve,reject)=>{recorder.onstop=resolve;recorder.onerror=e=>reject(e.error||new Error('Render gagal'))});
-  recorder.start(250);$('renderStatus').textContent='Sedang merender...';let start=performance.now();
-  await new Promise(resolve=>{function frame(now){let elapsed=(now-start)/1000;drawFrame(Math.min(elapsed,total-.01));let pct=Math.min(100,elapsed/total*100);$('progress').style.width=pct+'%';$('timeLabel').textContent=Math.round(pct)+'%';if(elapsed>=total)resolve();else requestAnimationFrame(frame)}requestAnimationFrame(frame)});
-  recorder.stop();await done;stream.getTracks().forEach(t=>t.stop());if(audioCtx)await audioCtx.close();if(audioEl){audioEl.pause();URL.revokeObjectURL(audioEl.src)}
-  const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'}),ext=(recorder.mimeType||'').includes('mp4')?'mp4':'webm',url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(($('projectTitle').value||'sosify-video').replace(/[^a-z0-9-_]+/gi,'-'))+'.'+ext;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
-  await saveProject('rendered');$('renderStatus').textContent='Selesai · file diunduh';$('progress').style.width='100%';$('timeLabel').textContent='100%';toast('Video berhasil dirender dan proyek tersimpan.');
- }catch(err){console.error(err);$('renderStatus').textContent='Render gagal';toast('Render gagal: '+(err.message||err));}
- finally{isRendering=false;$('renderBtn').disabled=false;$('previewBtn').disabled=false}
+  stream=c.captureStream(30);
+  if(!stream||!stream.getVideoTracks().length)throw new Error('Canvas tidak menghasilkan video stream. Muat ulang halaman lalu coba lagi.');
+  // Musik bersifat opsional. Jika browser menolak audio, render tetap berjalan tanpa musik.
+  if(audioFile){
+   try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC){
+     audioCtx=new AC();
+     const dest=audioCtx.createMediaStreamDestination();
+     audioEl=new Audio(URL.createObjectURL(audioFile));audioEl.loop=true;
+     const source=audioCtx.createMediaElementSource(audioEl);source.connect(dest);source.connect(audioCtx.destination);
+     dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+     await Promise.race([audioCtx.resume(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('Audio timeout')),2500))]);
+     await Promise.race([audioEl.play(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('Audio timeout')),2500))]);
+    }
+   }catch(audioErr){console.warn('Audio dilewati, render dilanjutkan tanpa musik:',audioErr);try{if(audioEl)audioEl.pause()}catch(e){}}
+  }
+  let mime=['video/mp4;codecs=h264,aac','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(x=>{try{return MediaRecorder.isTypeSupported(x)}catch(e){return false}})||'';
+  recorder=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);
+  const chunks=[];
+  recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  const stopped=new Promise((resolve,reject)=>{recorder.onstop=resolve;recorder.onerror=e=>reject(e.error||new Error('Perekam video mengalami kesalahan.'))});
+  recorder.start(250);
+  status.textContent='Sedang merender... jangan tutup tab ini';
+  label.textContent='1%';bar.style.width='1%';
+  const startTime=performance.now();
+  await new Promise((resolve,reject)=>{
+   const frame=now=>{
+    try{
+     const elapsed=Math.max(0,(now-startTime)/1000);
+     drawFrame(Math.min(elapsed,Math.max(0,total-0.01)));
+     const pct=Math.min(100,Math.max(1,elapsed/total*100));
+     bar.style.width=pct+'%';label.textContent=Math.floor(pct)+'%';
+     if(elapsed>=total){resolve();return}
+     rafId=requestAnimationFrame(frame);
+    }catch(err){reject(err)}
+   };
+   rafId=requestAnimationFrame(frame);
+  });
+  rafId=null;
+  if(recorder.state!=='inactive')recorder.stop();
+  await stopped;
+  const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});
+  if(!blob.size)throw new Error('File video kosong. Coba render ulang dengan satu foto dan tanpa musik.');
+  const ext=(recorder.mimeType||'').includes('mp4')?'mp4':'webm';
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=(($('projectTitle').value||'sosify-video').replace(/[^a-z0-9-_]+/gi,'-'))+'.'+ext;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  bar.style.width='100%';label.textContent='100%';
+  try{await saveProject('rendered');status.textContent='Selesai · file video diunduh';toast('Video berhasil dirender dan diunduh.');}
+  catch(saveErr){console.error('Video berhasil, tetapi metadata proyek gagal disimpan:',saveErr);status.textContent='Video selesai · riwayat proyek gagal disimpan';toast('Video berhasil diunduh. Riwayat proyek belum tersimpan: '+(saveErr.message||saveErr));}
+ }catch(err){
+  console.error('SOSIFY render error:',err);
+  status.textContent='Render gagal · '+(err.message||'Kesalahan tidak diketahui');
+  toast('Render gagal: '+(err.message||err));
+ }finally{
+  await cleanup();isRendering=false;btn.disabled=false;previewBtn.disabled=false;
+ }
 }
 $('renderBtn').onclick=renderVideo;
 async function loadProjects(){if(!sb||!user)return;$('projectList').textContent='Memuat proyek...';let {data,error}=await sb.from('video_projects').select('id,title,method,duration,aspect_ratio,status,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50);if(error){$('projectList').textContent='Gagal memuat: '+error.message;return}if(!data.length){$('projectList').textContent='Belum ada proyek. Buat video pertama Anda di Free Video Studio.';return}$('projectList').innerHTML='';for(let p of data){let row=document.createElement('div');row.className='projectrow';let icon=document.createElement('div');icon.className='projecticon';icon.textContent='🎬';let info=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('small');b.textContent=p.title;sm.textContent=`${p.method} · ${p.duration||''} · ${p.aspect_ratio||''} · ${new Date(p.created_at).toLocaleString('id-ID')}`;info.append(b,sm);let pill=document.createElement('span');pill.className='pill';pill.textContent=p.status||'draft';row.append(icon,info,pill);$('projectList').append(row)}}
